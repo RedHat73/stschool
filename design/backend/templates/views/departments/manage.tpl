@@ -5,9 +5,7 @@
 <form action="{""|fn_url}" method="post" id="departments_form" name="departments_form" enctype="multipart/form-data">
 <input type="hidden" name="fake" value="1" />
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true div_id="pagination_contents_departments"}
-
 {$c_url=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
-
 {$rev=$smarty.request.content_id|default:"pagination_contents_departments"}
 {include_ext file="common/icon.tpl" class="icon-`$search.sort_order_rev`" assign=c_icon}
 {include_ext file="common/icon.tpl" class="icon-dummy" assign=c_dummy}
@@ -17,7 +15,7 @@
 {if $departments}
     {capture name="departments_table"}
         <div class="table-responsive-wrapper longtap-selection">
-            <table width="100%" class="table table-middle table--relative table-responsive table--overflow-hidden departments-table" data-ca-main-content>
+            <table width="100%" class="table table-middle table--relative table-responsive" data-ca-main-content>
             <thead
             data-ca-bulkedit-default-object="true" 
             data-target=".departments-table" 
@@ -31,7 +29,7 @@
                     }
 
                     <input type="checkbox"
-                        class=" dit-toggler hide"
+                        class="bulkedit-toggler hide"
                         data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]"
                         data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
                     />
@@ -45,13 +43,13 @@
             </thead>
             {foreach from=$departments item=department}
             <tr class="cm-row-status-{$department.status|lower} cm-longtap-target"
-
+                {if $has_permission}
                     data-ca-longtap-action="setCheckBox"
                     data-ca-longtap-target="input.cm-item"
                     data-ca-id="{$department.department_id}"
-
+                {/if}
             >
-                {$allow_save=$department|fn_allow_save_object:"department"}
+                {$allow_save=$department|fn_allow_save_object:"departments"}
 
                 {if $allow_save}
                     {$no_hide_input="cm-no-hide-input"}
@@ -72,8 +70,8 @@
                         file="common/image.tpl"
                         image=$department.main_pair.icon|default:$department.main_pair.detailed
                         image_id=$department.main_pair.image_id
-                        image_width=$image_width
-                        image_height=$image_height
+                        image_width=$settings.Thumbnails.product_lists_thumbnail_width 
+                        image_height=$settings.Thumbnails.product_lists_thumbnail_height 
                         href="departments.update?department_id=`$department.department_id`"|fn_url
                         image_css_class="departments-list__image--img"
                         link_css_class="departments-list__image--link"
@@ -120,9 +118,7 @@
 
 {capture name="buttons"}
     {capture name="tools_list"}
-    {if $allow_save}
         <li>{btn type="list" class="cm-confirm" form= "departments_form" text=__("delete") href="departments.m_delete" method="POST"}</li>
-    {/if}
     {/capture}
     <div class="hidden-tools">
         {dropdown content=$smarty.capture.tools_list}
@@ -132,7 +128,7 @@
 {capture name="adv_buttons"}
     {include file="common/tools.tpl" tool_href="departments.add" prefix="top" hide_tools="true" title=__("add_department") icon="icon-plus"}
 {/capture}
-
+{include file="common/popupbox.tpl" id="select_fields_to_edit" text=__("select_fields_to_edit") content=$smarty.capture.select_fields_to_edit}
 </form>
 
 {/capture}
