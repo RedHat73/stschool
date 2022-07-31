@@ -31,6 +31,7 @@
                 {if $settings.General.enable_edp == "Y"}
                 <li class="ty-account-info__item ty-dropdown-box__item"><a class="ty-account-info__a underlined" href="{"orders.downloads"|fn_url}" rel="nofollow">{__("downloads")}</a></li>
                 {/if}
+                <li class="ty-account-info__item ty-dropdown-box__item"><a class="ty-account-info__a underlined" href="{"departments.departments"|fn_url}" rel="nofollow">{__("departments")}</a></li>
             {elseif $user_data.firstname || $user_data.lastname}
                 <li class="ty-account-info__item  ty-dropdown-box__item ty-account-info__name">{$user_data.firstname} {$user_data.lastname}</li>
             {elseif $user_data.email}
