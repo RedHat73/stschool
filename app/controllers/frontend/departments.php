@@ -21,13 +21,16 @@ if ($mode == 'departments')
     Tygh::$app['session']['continue_url'] = "departments.departments";
 
     $params = $_REQUEST;
-    if ($items_per_page = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'items_per_page')) {
+    if ($items_per_page = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'items_per_page')) 
+    {
         $params['items_per_page'] = $items_per_page;
     }
-    if ($sort_by = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_by')) {
+    if ($sort_by = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_by')) 
+    {
         $params['sort_by'] = $sort_by;
     }
-    if ($sort_order = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_order')) {
+    if ($sort_order = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_order')) 
+    {
         $params['sort_order'] = $sort_order;
     }
 
@@ -98,7 +101,8 @@ if ($mode == 'departments')
 function fn_get_department_data($department_id = 0, $lang_code = CART_LANGUAGE)
 {
     $departments = [];
-    if (!empty($department_id)) {
+    if (!empty($department_id)) 
+    {
         list ($departments) = fn_get_departments([
             'department_id' => $department_id
         ], 1, $lang_code);
@@ -121,7 +125,8 @@ function fn_get_departments($params = [], $items_per_page = 6, $lang_code = CART
 
     $params = array_merge($default_params, $params);
 
-    if (AREA == 'C') {
+    if (AREA == 'C') 
+    {
         $params['status'] = 'A';
     }
 
@@ -134,29 +139,35 @@ function fn_get_departments($params = [], $items_per_page = 6, $lang_code = CART
 
     $condition = $limit = $join = '';
 
-    if (!empty($params['limit'])) {
+    if (!empty($params['limit'])) 
+    {
         $limit = db_quote(' LIMIT 0, ?i', $params['limit']);
     }
 
     $sorting = db_sort($params, $sortings, 'name', 'asc');
 
-    if (!empty($params['item_ids'])) {
+    if (!empty($params['item_ids'])) 
+    {
         $condition .= db_quote(' AND ?:departments.department_id IN (?n)', explode(',', $params['item_ids']));
     }
 
-    if (!empty($params['department_id'])) {
+    if (!empty($params['department_id'])) 
+    {
             $condition .= db_quote(' AND ?:departments.department_id = ?i', $params['department_id']);
-        }
+    }
     
-    if (!empty($params['user_id'])) {
+    if (!empty($params['user_id'])) 
+    {
         $condition .= db_quote(' AND ?:departments.user_id = ?i', $params['user_id']);
     }
 
-    if (!empty($params['timestamp'])) {
+    if (!empty($params['timestamp'])) 
+    {
         $condition .= db_quote(' AND ?:departments.timestamp = ?i', $params['timestamp']);
     }
 
-    if (!empty($params['status'])) {
+    if (!empty($params['status'])) 
+    {
         $condition .= db_quote(' AND ?:departments.status = ?s', $params['status']);
     }
 
@@ -170,7 +181,8 @@ function fn_get_departments($params = [], $items_per_page = 6, $lang_code = CART
     $join .= db_quote(' LEFT JOIN ?:department_descriptions ON ?:department_descriptions.department_id = ?:departments.department_id AND ?:department_descriptions.lang_code = ?s', $lang_code);
     $join .= db_quote(' LEFT JOIN ?:department_images ON ?:department_images.department_id = ?:departments.department_id AND ?:department_images.lang_code = ?s', $lang_code);
 
-    if (!empty($params['items_per_page'])) {
+    if (!empty($params['items_per_page'])) 
+    {
         $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:departments $join WHERE 1 $condition");
         $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
     }
@@ -182,14 +194,16 @@ function fn_get_departments($params = [], $items_per_page = 6, $lang_code = CART
         'department_id', implode(', ', $fields), $condition, $sorting, $limit
     );
     
-    if (!empty($params['item_ids'])) {
+    if (!empty($params['item_ids'])) 
+    {
         $departments = fn_sort_by_ids($departments, explode(',', $params['item_ids']), 'department_id');
     }
     
     $department_image_ids = array_keys($departments);
     $images = fn_get_image_pairs($department_image_ids, 'department', 'M', true, false, $lang_code);
 
-    foreach ($departments as $department_id => $department) {
+    foreach ($departments as $department_id => $department) 
+    {
         $departments[$department_id]['main_pair'] = !empty($images[$department_id]) ? reset($images[$department_id]) : array();
     }
     return array($departments, $params);
@@ -198,7 +212,8 @@ function fn_get_departments($params = [], $items_per_page = 6, $lang_code = CART
 function fn_update_department($data, $department_id, $lang_code = CART_LANGUAGE)
 {
 
-    if (!empty($data['timestamp'])) {
+    if (!empty($data['timestamp'])) 
+    {
         $data['timestamp'] = fn_parse_date($data['timestamp']);
     }
 
@@ -214,13 +229,15 @@ function fn_update_department($data, $department_id, $lang_code = CART_LANGUAGE)
         $department_image_exist = !empty($department_image_id);
         $image_is_update = fn_departments_need_image_update();
 
-        if (!$image_is_update && $department_image_exist) {
+        if (!$image_is_update && $department_image_exist) 
+        {
             fn_delete_image_pairs($department_image_id, 'department');
             db_query("DELETE FROM ?:department_images WHERE department_id = ?i AND lang_code = ?s", $department_id, $lang_code);
             $department_image_exist = false;
         }
 
-        if ($image_is_update && !$department_image_exist) {
+        if ($image_is_update && !$department_image_exist) 
+        {
             $department_image_id = db_query("INSERT INTO ?:department_images (department_id, lang_code) VALUE(?i, ?s)", $department_id, $lang_code);
         }
 
@@ -321,7 +338,8 @@ function fn_departments_image_all_links($department_id, $pair_data, $lang_code_l
 
 function fn_delete_department_by_id($department_id)
 {
-    if (!empty($department_id)) {
+    if (!empty($department_id)) 
+    {
         db_query("DELETE FROM ?:departments WHERE department_id = ?i", $department_id);
         db_query("DELETE FROM ?:department_descriptions WHERE department_id = ?i", $department_id);
         db_query("DELETE FROM ?:department_images WHERE department_id = ?i", $department_id);
